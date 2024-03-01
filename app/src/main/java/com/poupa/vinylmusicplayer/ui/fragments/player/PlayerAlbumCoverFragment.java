@@ -214,6 +214,13 @@ public class PlayerAlbumCoverFragment extends AbsMusicServiceFragment implements
 
     @Override
     public void onUpdateProgressViews(int progress, int total) {
+
+        if (!(lyrics instanceof AbsSynchronizedLyrics synchronizedLyrics)) return;
+        String line = synchronizedLyrics.getLine(progress);
+        if (PreferenceUtil.getInstance().bluetoothLyricsShow()) {
+            MusicPlayerRemote.updateLyric(line);
+        }
+
         if (!isLyricsLayoutBound()) return;
 
         if (!isLyricsLayoutVisible()) {
@@ -221,14 +228,12 @@ public class PlayerAlbumCoverFragment extends AbsMusicServiceFragment implements
             return;
         }
 
-        if (!(lyrics instanceof AbsSynchronizedLyrics)) return;
-        AbsSynchronizedLyrics synchronizedLyrics = (AbsSynchronizedLyrics) lyrics;
 
         lyricsLayout.setVisibility(View.VISIBLE);
         lyricsLayout.setAlpha(1f);
 
         String oldLine = lyricsLine2.getText().toString();
-        String line = synchronizedLyrics.getLine(progress);
+
 
         if (!oldLine.equals(line) || oldLine.isEmpty()) {
             lyricsLine1.setText(oldLine);

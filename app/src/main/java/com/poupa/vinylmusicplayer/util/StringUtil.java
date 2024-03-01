@@ -3,8 +3,12 @@ package com.poupa.vinylmusicplayer.util;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.nio.charset.Charset;
 import java.text.Collator;
 import java.text.Normalizer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -17,6 +21,7 @@ public class StringUtil {
         SECOND,
         EQUAL
     }
+
     private static final Collator collator = Collator.getInstance();
     private static final Pattern accentStripRegex = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
 
@@ -33,16 +38,17 @@ public class StringUtil {
 
     /**
      * Returns which string contains a closer match for compareTo.
-     *
+     * <p>
      * Shortest string > string with compareTo closer to front
      * or equal if neither of those two cases satisfied
      *
      * @param compareTo string being searched for
-     * @param first string that contains compareTo
-     * @param second string that contains compareTo
+     * @param first     string that contains compareTo
+     * @param second    string that contains compareTo
      * @return ClosestMatch
      */
-    @NonNull public static ClosestMatch closestOfMatches(
+    @NonNull
+    public static ClosestMatch closestOfMatches(
             @NonNull final String compareTo,
             @NonNull final String first,
             @NonNull final String second) {
@@ -81,6 +87,56 @@ public class StringUtil {
     public static String stripAccent(@NonNull final String text) {
         return accentStripRegex.matcher(text).replaceAll("");
     }
+
+    public static List<String> wideCharacterSplit(String src, int bytes) {
+
+        if (src == null) {
+            return null;
+        }
+        List<String> splitList = new ArrayList<String>();
+        src = src.trim();
+
+        // If the line is less than bytes, there is no need to split
+        if (src.getBytes(Charset.forName("GBK")).length <= bytes) {
+            splitList.add(src);
+            return splitList;
+        }
+
+        // Firstly try to split the lyric by space
+        String[] separated = src.split("\\s+");
+        if (separated.length < 4) {
+            boolean canReturn = true;
+            for (String s : separated) {
+                if (s.getBytes(Charset.forName("GBK")).length > bytes) {
+                    canReturn = false;
+                }
+            }
+            if (canReturn) {
+                splitList.addAll(Arrays.asList(separated));
+                return splitList;
+            }
+        }
+
+        // Secondly try to split the lyric by fixed width
+        int startIndex = 0;    // start of string
+        int endIndex;
+        while (startIndex < src.length()) {
+            // At the end, need to compare with src.length(), in order not to cause index out of range.
+            endIndex = Math.min((startIndex + bytes), src.length());
+            String subString = src.substring(startIndex, endIndex);
+            // If string length is bigger than bytes, means wide character are in the string
+            // In GBK encoding, chinese character took 2 bytes, and in UTF-8, it took 3 bytes.
+            while (subString.getBytes(Charset.forName("GBK")).length > bytes) {
+                --endIndex;
+                subString = src.substring(startIndex, endIndex);
+            }
+            splitList.add(subString);
+            startIndex = endIndex;
+        }
+        return splitList;
+
+    }
+
 
     @NonNull
     public static String join(@NonNull String... s) {

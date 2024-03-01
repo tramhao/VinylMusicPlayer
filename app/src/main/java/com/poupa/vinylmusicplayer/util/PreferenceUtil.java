@@ -85,9 +85,11 @@ public final class PreferenceUtil {
     private static final String AUDIO_DUCKING = "audio_ducking";
     public static final String GAPLESS_PLAYBACK = "gapless_playback";
 
-    @Deprecated public static final String LAST_ADDED_CUTOFF = "last_added_interval";
+    @Deprecated
+    public static final String LAST_ADDED_CUTOFF = "last_added_interval";
     public static final String LAST_ADDED_CUTOFF_V2 = "last_added_interval_v2";
-    @Deprecated public static final String RECENTLY_PLAYED_CUTOFF = "recently_played_interval";
+    @Deprecated
+    public static final String RECENTLY_PLAYED_CUTOFF = "recently_played_interval";
     public static final String RECENTLY_PLAYED_CUTOFF_V2 = "recently_played_interval_v2";
     public static final String NOT_RECENTLY_PLAYED_CUTOFF_V2 = "not_recently_played_interval_v2";
     public static final String MAINTAIN_TOP_TRACKS_PLAYLIST = "maintain_top_tracks_playlist";
@@ -107,6 +109,8 @@ public final class PreferenceUtil {
 
     private static final String START_DIRECTORY = "start_directory";
 
+    public static final String BLUETOOTH_LYRICS_SHOW = "bluetooth_lyrics_show";
+
     private static final String SYNCHRONIZED_LYRICS_SHOW = "synchronized_lyrics_show";
     private static final String ANIMATE_PLAYING_SONG_ICON = "animate_playing_song_icon";
     private static final String SHOW_SONG_NUMBER = "show_song_number_on_playing_queue";
@@ -119,7 +123,8 @@ public final class PreferenceUtil {
 
     private static final String REMEMBER_SHUFFLE = "remember_shuffle";
 
-    @Deprecated public static final String RG_SOURCE_MODE = "replaygain_srource_mode";
+    @Deprecated
+    public static final String RG_SOURCE_MODE = "replaygain_srource_mode";
     public static final String RG_SOURCE_MODE_V2 = "replaygain_source_mode";
     public static final String RG_PREAMP_WITH_TAG = "replaygain_preamp_with_tag";
     public static final String RG_PREAMP_WITHOUT_TAG = "replaygain_preamp_without_tag";
@@ -246,7 +251,9 @@ public final class PreferenceUtil {
     public NowPlayingScreen getNowPlayingScreen() {
         final int id = mPreferences.getInt(NOW_PLAYING_SCREEN_ID, 0);
         for (final NowPlayingScreen nowPlayingScreen : NowPlayingScreen.values()) {
-            if (nowPlayingScreen.id == id) {return nowPlayingScreen;}
+            if (nowPlayingScreen.id == id) {
+                return nowPlayingScreen;
+            }
         }
         return NowPlayingScreen.CARD;
     }
@@ -346,7 +353,9 @@ public final class PreferenceUtil {
     }
 
     private void migrateCutoffV1AsV2(@NonNull final String cutoffV1, @NonNull final String cutoffV2) {
-        if (mPreferences.contains(cutoffV2)) {return;}
+        if (mPreferences.contains(cutoffV2)) {
+            return;
+        }
 
         final String migratedValue;
         switch (mPreferences.getString(cutoffV1, "")) {
@@ -402,15 +411,22 @@ public final class PreferenceUtil {
             final int count = Integer.parseInt(Objects.requireNonNull(matcher.group(1)));
             final String unit = matcher.group(2);
 
-            if (count == 0) {return disabledValue;}
-            else if (count < 0 || unit == null) {return defaultValue;}
-            else {
+            if (count == 0) {
+                return disabledValue;
+            } else if (count < 0 || unit == null) {
+                return defaultValue;
+            } else {
                 switch (unit) {
-                    case "d": return new Pair<>(count, ChronoUnit.DAYS);
-                    case "w": return new Pair<>(count, ChronoUnit.WEEKS);
-                    case "m": return new Pair<>(count, ChronoUnit.MONTHS);
-                    case "y": return new Pair<>(count, ChronoUnit.YEARS);
-                    default: return defaultValue;
+                    case "d":
+                        return new Pair<>(count, ChronoUnit.DAYS);
+                    case "w":
+                        return new Pair<>(count, ChronoUnit.WEEKS);
+                    case "m":
+                        return new Pair<>(count, ChronoUnit.MONTHS);
+                    case "y":
+                        return new Pair<>(count, ChronoUnit.YEARS);
+                    default:
+                        return defaultValue;
                 }
             }
         } else {
@@ -420,7 +436,9 @@ public final class PreferenceUtil {
 
     private long getCutoffTimeMillisV2(@NonNull final String cutoff) {
         final Pair<Integer, ChronoUnit> value = getCutoffTimeV2(cutoff);
-        if (value.first <= 0) {return 0;} // Disabled
+        if (value.first <= 0) {
+            return 0;
+        } // Disabled
 
         final CalendarUtil calendarUtil = new CalendarUtil();
         long interval = System.currentTimeMillis();
@@ -441,7 +459,9 @@ public final class PreferenceUtil {
     @NonNull
     private String getCutoffTextV2(@NonNull final String cutoff, final Context context) {
         final Pair<Integer, ChronoUnit> value = getCutoffTimeV2(cutoff);
-        if (value.first <= 0) {return context.getString(R.string.pref_playlist_disabled);}
+        if (value.first <= 0) {
+            return context.getString(R.string.pref_playlist_disabled);
+        }
 
         if (value.second == ChronoUnit.DAYS) {
             return value.first == 1
@@ -663,6 +683,10 @@ public final class PreferenceUtil {
         return mPreferences.getBoolean(SYNCHRONIZED_LYRICS_SHOW, true);
     }
 
+    public final boolean bluetoothLyricsShow() {
+        return mPreferences.getBoolean(BLUETOOTH_LYRICS_SHOW, false);
+    }
+
     public boolean animatePlayingSongIcon() {
         return mPreferences.getBoolean(ANIMATE_PLAYING_SONG_ICON, false);
     }
@@ -792,19 +816,27 @@ public final class PreferenceUtil {
 
 
     public @Nullable List<String> getOopsHandlerReports() {
-        if (!isOopsHandlerEnabled()) {return null;}
+        if (!isOopsHandlerEnabled()) {
+            return null;
+        }
 
         final String json = mPreferences.getString(OOPS_HANDLER_EXCEPTIONS, "");
-        if (json.isEmpty()) {return null;}
+        if (json.isEmpty()) {
+            return null;
+        }
 
         return new ArrayList<>(Arrays.asList(new Gson().fromJson(json, String[].class)));
     }
 
     void pushOopsHandlerReport(@NonNull String report) {
-        if (!isOopsHandlerEnabled()) {return;}
+        if (!isOopsHandlerEnabled()) {
+            return;
+        }
 
         List<String> reports = getOopsHandlerReports();
-        if (reports == null) {reports = new ArrayList<>();}
+        if (reports == null) {
+            reports = new ArrayList<>();
+        }
 
         // The last report sits in the first position (LIFO)
         reports.add(0, report);
@@ -822,10 +854,14 @@ public final class PreferenceUtil {
     }
 
     public @Nullable String popOopsHandlerReport() {
-        if (!isOopsHandlerEnabled()) {return null;}
+        if (!isOopsHandlerEnabled()) {
+            return null;
+        }
 
         List<String> reports = getOopsHandlerReports();
-        if (reports == null || reports.isEmpty()) {return null;}
+        if (reports == null || reports.isEmpty()) {
+            return null;
+        }
 
         final String result = reports.remove(0);
 

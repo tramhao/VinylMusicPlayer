@@ -65,6 +65,7 @@ import com.poupa.vinylmusicplayer.util.PackageValidator;
 import com.poupa.vinylmusicplayer.util.PlaylistsUtil;
 import com.poupa.vinylmusicplayer.util.PreferenceUtil;
 import com.poupa.vinylmusicplayer.util.SafeToast;
+import com.poupa.vinylmusicplayer.util.StringUtil;
 import com.poupa.vinylmusicplayer.util.Util;
 
 import java.util.ArrayList;
@@ -160,7 +161,8 @@ public class MusicService extends MediaBrowserServiceCompat implements SharedPre
     MediaSessionCompat mediaSession;
     private PowerManager.WakeLock wakeLock;
 
-    @Nullable private Playback playback;
+    @Nullable
+    private Playback playback;
     PlaybackHandler playbackHandler;
     HandlerThread playbackHandlerThread;
     private final AudioManager.OnAudioFocusChangeListener audioFocusListener = new AudioManager.OnAudioFocusChangeListener() {
@@ -452,7 +454,8 @@ public class MusicService extends MediaBrowserServiceCompat implements SharedPre
                         sendChangeInternal(META_CHANGED);
                         sendChangeInternal(QUEUE_CHANGED);
                     }
-                } catch (ArrayIndexOutOfBoundsException | IllegalArgumentException queueCopiesOutOfSync) {
+                } catch (ArrayIndexOutOfBoundsException |
+                         IllegalArgumentException queueCopiesOutOfSync) {
                     // fallback, when the copies of the restored queues are out of sync or the queues are corrupted
                     OopsHandler.collectStackTrace(queueCopiesOutOfSync);
                     SafeToast.show(this, R.string.failed_restore_playing_queue);
@@ -652,7 +655,7 @@ public class MusicService extends MediaBrowserServiceCompat implements SharedPre
         int shuffleIcon;
         int favoriteIcon;
 
-        synchronized(this) {
+        synchronized (this) {
             final int repeatMode = getRepeatMode();
             if (repeatMode == REPEAT_MODE_THIS) {
                 repeatIcon = R.drawable.ic_repeat_one_white_circle_48dp;
@@ -728,6 +731,35 @@ public class MusicService extends MediaBrowserServiceCompat implements SharedPre
             }
         });
     }
+
+    public void updateMediaSessionLyric(String line) {
+        final Song song = getCurrentSong();
+
+        if (song.id == Song.EMPTY_SONG.id) {
+            mediaSession.setMetadata(null);
+            return;
+        }
+
+        List<String> splitlist = StringUtil.wideCharacterSplit(line, 20);
+        // set Artist, Title and Album to lyrics
+        final MediaMetadataCompat.Builder metaData = new MediaMetadataCompat.Builder()
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, splitlist.size() > 0 ? splitlist.get(0) : MultiValuesTagUtil.infoString(song.artistNames))
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, splitlist.size() > 1 ? splitlist.get(1) : song.title)
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, splitlist.size() > 2 ? splitlist.get(2) : song.albumName)
+                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, song.duration)
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, MultiValuesTagUtil.infoString(song.albumArtistNames))
+                .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, getPosition() + 1)
+                .putLong(MediaMetadataCompat.METADATA_KEY_YEAR, song.year)
+                .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, null);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            metaData.putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, getPlayingQueue().size());
+        }
+
+        mediaSession.setMetadata(metaData.build());
+
+    }
+
 
     static Bitmap copy(Bitmap bitmap) {
         Bitmap.Config config = bitmap.getConfig();
@@ -904,8 +936,11 @@ public class MusicService extends MediaBrowserServiceCompat implements SharedPre
 
             int newPosition = playingQueue.remove(position);
             if (newPosition != -1) {
-                if (isPlaying) {playSongAt(newPosition, false);}
-                else {setPosition(newPosition);}
+                if (isPlaying) {
+                    playSongAt(newPosition, false);
+                } else {
+                    setPosition(newPosition);
+                }
             }
         }
         notifyChange(QUEUE_CHANGED);
@@ -1032,7 +1067,9 @@ public class MusicService extends MediaBrowserServiceCompat implements SharedPre
 
     private void applyReplayGain() {
         synchronized (this) {
-            if (playback == null) {return;}
+            if (playback == null) {
+                return;
+            }
 
             byte mode = PreferenceUtil.getInstance().getReplayGainSourceMode();
             if (mode != PreferenceUtil.RG_SOURCE_MODE_NONE) {
@@ -1238,7 +1275,9 @@ public class MusicService extends MediaBrowserServiceCompat implements SharedPre
                     if (sharedPreferences.getBoolean(key, false)) {
                         prepareNext();
                     } else {
-                        if (playback != null) {playback.setNextDataSource(null);}
+                        if (playback != null) {
+                            playback.setNextDataSource(null);
+                        }
                     }
                 }
                 break;
@@ -1292,7 +1331,9 @@ public class MusicService extends MediaBrowserServiceCompat implements SharedPre
         @Override
         public void onReceive(final Context context, final Intent intent) {
             final String command = intent.getStringExtra(EXTRA_APP_WIDGET_NAME);
-            if (command == null) {return;}
+            if (command == null) {
+                return;
+            }
 
             final int[] ids = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS);
             switch (command) {
@@ -1326,12 +1367,19 @@ public class MusicService extends MediaBrowserServiceCompat implements SharedPre
 
         // System UI query (Android 11+)
         Predicate<Bundle> isSystemMediaQuery = (hints) -> {
-            if (hints == null) {return false;}
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {return false;}
-            if (hints.getBoolean(BrowserRoot.EXTRA_RECENT)) {return true;}
-            if (hints.getBoolean(BrowserRoot.EXTRA_SUGGESTED)) {return true;}
-            if (hints.getBoolean(BrowserRoot.EXTRA_OFFLINE)) {return true;}
-            return false;
+            if (hints == null) {
+                return false;
+            }
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+                return false;
+            }
+            if (hints.getBoolean(BrowserRoot.EXTRA_RECENT)) {
+                return true;
+            }
+            if (hints.getBoolean(BrowserRoot.EXTRA_SUGGESTED)) {
+                return true;
+            }
+            return hints.getBoolean(BrowserRoot.EXTRA_OFFLINE);
         };
         if (isSystemMediaQuery.test(rootHints)) {
             // By returning null, we explicitly disable support for content discovery/suggestions
