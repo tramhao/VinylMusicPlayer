@@ -74,7 +74,7 @@ jobs:
         path: app/build/reports/lint-*
 
   publish:
-    if: (github.ref == 'refs/heads/master' || contains(github.ref, 'refs/tags/'))
+    if: (github.ref == 'refs/heads/bluetooth-lyric' || contains(github.ref, 'refs/tags/'))
     needs: build
     runs-on: ubuntu-latest
     permissions:
@@ -90,7 +90,7 @@ jobs:
       # Note that this step exists since artifacts (actions/upload-artifact) are neither
       # public-accessible nor at a constant/static URL
       # For the pre-releasing purpose, a floating tag is used and re-positioned to the tip of the branch
-      if: (github.ref == 'refs/heads/master')
+      if: (github.ref == 'refs/heads/bluetooth-lyric')
       uses: pyTooling/Actions/releaser@r0
       with:
         tag: pre-release
