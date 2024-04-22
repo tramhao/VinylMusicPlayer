@@ -1,5 +1,45 @@
 # Changelog
 
+## [1.10.0] - 2024-04-04
+
+### Fixes
+* Keep the queue in sync with changes from MediaStore (removal, update) by @soncaokim in https://github.com/VinylMusicPlayer/VinylMusicPlayer/pull/969
+* Fix regression on discography (album) introduced by #992 (multi-artist-navigation) by @soncaokim in https://github.com/VinylMusicPlayer/VinylMusicPlayer/pull/1007
+* Fix crash described by #1008 by @soncaokim in https://github.com/VinylMusicPlayer/VinylMusicPlayer/pull/1009
+* Fix issue #974 by @soncaokim in https://github.com/VinylMusicPlayer/VinylMusicPlayer/pull/1010
+* Snackbar tweaks by @soncaokim in https://github.com/VinylMusicPlayer/VinylMusicPlayer/pull/991
+
+**Full Changelog**: https://github.com/VinylMusicPlayer/VinylMusicPlayer/compare/1.9.0...1.10.0
+
+## [1.9.0] - 2024-03-30
+
+### Features
+* Multi artists navigation by @soncaokim in https://github.com/VinylMusicPlayer/VinylMusicPlayer/pull/992
+* Improve unknown artist/album/genre/song title display by @soncaokim in https://github.com/VinylMusicPlayer/VinylMusicPlayer/pull/994
+
+**Full Changelog**: https://github.com/VinylMusicPlayer/VinylMusicPlayer/compare/1.8.4...1.9.0
+
+## [1.8.4] - 2024-03-23
+
+### Fixes
+* Hotfix for regression introduced by PR #989 by @soncaokim in https://github.com/VinylMusicPlayer/VinylMusicPlayer/pull/996
+
+**Full Changelog**: https://github.com/VinylMusicPlayer/VinylMusicPlayer/compare/1.8.3...1.8.4
+
+## [1.8.3] - 2024-03-23
+
+### Fixes
+* Refactor multi select by @soncaokim in https://github.com/VinylMusicPlayer/VinylMusicPlayer/pull/958
+* Dont collect the stack trace if the underlying library  cannot read the media file by @soncaokim in https://github.com/VinylMusicPlayer/VinylMusicPlayer/pull/989
+* End the DB transaction properly (in case of failure) by @soncaokim in https://github.com/VinylMusicPlayer/VinylMusicPlayer/pull/990
+* Clean obsolete DB columns by @soncaokim in https://github.com/VinylMusicPlayer/VinylMusicPlayer/pull/993
+
+### Other Changes
+* feat(translations): add Dutch translation by @AnonymousWP in https://github.com/VinylMusicPlayer/VinylMusicPlayer/pull/986
+* Apply build pipeline on PR as well by @soncaokim in https://github.com/VinylMusicPlayer/VinylMusicPlayer/pull/987
+
+**Full Changelog**: https://github.com/VinylMusicPlayer/VinylMusicPlayer/compare/1.8.2...1.8.3
+
 ## [1.8.2] - 2024-03-13
 
 ### Fixes
