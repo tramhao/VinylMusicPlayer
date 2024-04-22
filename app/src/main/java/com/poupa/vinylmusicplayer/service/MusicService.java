@@ -789,11 +789,11 @@ public class MusicService extends MediaBrowserServiceCompat implements SharedPre
         List<String> splitlist = StringUtil.wideCharacterSplit(line, 20);
         // set Artist, Title and Album to lyrics
         final MediaMetadataCompat.Builder metaData = new MediaMetadataCompat.Builder()
-                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, splitlist.size() > 0 ? splitlist.get(0) : MultiValuesTagUtil.infoString(song.artistNames))
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, splitlist.size() > 0 ? splitlist.get(0) : MultiValuesTagUtil.infoStringAsArtists(song.artistNames))
                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, splitlist.size() > 1 ? splitlist.get(1) : song.title)
                 .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, splitlist.size() > 2 ? splitlist.get(2) : song.albumName)
                 .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, song.duration)
-                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, MultiValuesTagUtil.infoString(song.albumArtistNames))
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, MultiValuesTagUtil.infoStringAsArtists(song.albumArtistNames))
                 .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, getPosition() + 1)
                 .putLong(MediaMetadataCompat.METADATA_KEY_YEAR, song.year)
                 .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, null);
